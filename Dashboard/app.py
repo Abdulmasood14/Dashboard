@@ -154,10 +154,8 @@ class CompanyDataProcessor:
                 ]
                 self.available_dates = predefined_dates
             
-            if self.available_dates:
-                st.success(f"Found {len(self.available_dates)} available dates")
-            else:
-                st.warning("No dates configured. Please check your setup.")
+            # Silently load dates without showing status messages
+            pass
                 
         except Exception as e:
             st.error(f"Error loading dates: {str(e)}")
@@ -179,7 +177,7 @@ class CompanyDataProcessor:
         return None
     
     def load_company_data_for_date(self, selected_date):
-        """Load company data for specific date from GitHub using direct URL with improved error handling"""
+        """Load company data for specific date from GitHub using direct URL"""
         if not selected_date:
             return
         
@@ -206,8 +204,6 @@ class CompanyDataProcessor:
                     # Validate columns
                     required_columns = ['Company_Name', 'Extracted_Links', 'Extracted_Text']
                     if not all(col in df.columns for col in required_columns):
-                        st.error(f"CSV file must contain columns: {required_columns}")
-                        st.error(f"Found columns: {list(df.columns)}")
                         continue
                     
                     # Process the data
@@ -227,18 +223,12 @@ class CompanyDataProcessor:
                             }
                     
                     self.companies_data = companies_data
-                    st.success(f"Successfully loaded data for {date_str} from: {github_raw_url}")
                     return
                     
             except Exception as e:
-                st.warning(f"Failed to load from {github_raw_url}: {str(e)}")
                 continue
         
         # If we reach here, none of the URLs worked
-        st.error(f"Failed to download CSV file for {date_str} from any location")
-        st.error("Tried the following URLs:")
-        for url in possible_urls:
-            st.code(url)
         self.companies_data = {}
     
     def get_companies_list(self):
