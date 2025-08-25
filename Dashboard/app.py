@@ -340,14 +340,19 @@ def show_dashboard(processor):
                 "Available dates:",
                 date_options,
                 index=current_index,
-                format_func=lambda x: x.strftime("%d %B %Y (%A)") if x != "Select a date..." else x
+                format_func=lambda x: x.strftime("%d %B %Y (%A)") if x != "Select a date..." else x,
+                key="date_dropdown"
             )
             
             # Update session state only if a real date is selected
             if selected_option != "Select a date...":
-                st.session_state.selected_date = selected_option
+                if st.session_state.selected_date != selected_option:
+                    st.session_state.selected_date = selected_option
+                    st.rerun()
             else:
-                st.session_state.selected_date = None
+                if st.session_state.selected_date is not None:
+                    st.session_state.selected_date = None
+                    st.rerun()
     
     with col2:
         # Calendar picker (alternative selection)
@@ -356,11 +361,14 @@ def show_dashboard(processor):
                 "Or pick a date:",
                 value=st.session_state.selected_date if st.session_state.selected_date else available_dates[0],
                 min_value=min(available_dates) if available_dates else date.today(),
-                max_value=max(available_dates) if available_dates else date.today()
+                max_value=max(available_dates) if available_dates else date.today(),
+                key="date_picker"
             )
             
             if calendar_date in available_dates:
-                st.session_state.selected_date = calendar_date
+                if st.session_state.selected_date != calendar_date:
+                    st.session_state.selected_date = calendar_date
+                    st.rerun()
             elif calendar_date not in available_dates:
                 st.warning(f"No data available for {calendar_date.strftime('%d.%m.%Y')}")
     
