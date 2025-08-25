@@ -14,291 +14,104 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for Dark Glacier UI effects
+# Custom CSS for better styling
 st.markdown("""
 <style>
-    /* Dark theme base */
-    .main {
-        background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #1a1a2e 100%);
-        color: #e8f4f8;
-    }
-    
-    .stApp {
-        background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #1a1a2e 100%);
-    }
-    
-    /* Sidebar dark glacier theme */
-    .css-1d391kg {
-        background: linear-gradient(180deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
-    }
-    
     .company-card {
-        background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 25%, #4a90b8 50%, #87ceeb 75%, #b0e0e6 100%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #ff6b9d 100%);
         border-radius: 25px;
-        color: #0f0f23;
+        color: white;
         text-align: center;
-        box-shadow: 0 15px 35px rgba(135, 206, 235, 0.3), 0 0 25px rgba(176, 224, 230, 0.2);
+        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3);
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         min-height: 200px;
         font-size: 26px;
         font-weight: 700;
-        text-shadow: 0 2px 10px rgba(15, 15, 35, 0.3);
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         position: relative;
         overflow: hidden;
         padding: 60px 20px;
         cursor: pointer;
-        border: 2px solid rgba(135, 206, 235, 0.4);
+        border: none;
         margin: 10px 0;
-        backdrop-filter: blur(10px);
-    }
-    
-    .company-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-        transition: left 0.5s;
-    }
-    
-    .company-card:hover::before {
-        left: 100%;
     }
     
     .company-card:hover {
         transform: translateY(-15px) scale(1.03);
-        box-shadow: 0 25px 50px rgba(135, 206, 235, 0.4), 0 0 40px rgba(176, 224, 230, 0.3);
-        background: linear-gradient(135deg, #2d5a87 0%, #4a90b8 25%, #87ceeb 50%, #b0e0e6 75%, #e0f6ff 100%);
-        border: 2px solid rgba(135, 206, 235, 0.8);
+        box-shadow: 0 25px 50px rgba(102, 126, 234, 0.4);
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 50%, #ff6b9d 100%);
     }
     
     .main-header {
         text-align: center;
-        color: #87ceeb;
+        color: #2E86AB;
         margin-bottom: 30px;
-        text-shadow: 0 0 20px rgba(135, 206, 235, 0.5);
-        font-weight: 700;
     }
     
     .section-header {
-        color: #b0e0e6;
-        border-bottom: 2px solid #4a90b8;
+        color: #2E86AB;
+        border-bottom: 2px solid #2E86AB;
         padding-bottom: 5px;
         margin-top: 20px;
         margin-bottom: 15px;
-        text-shadow: 0 0 10px rgba(176, 224, 230, 0.3);
-        background: linear-gradient(90deg, #1e3a5f, transparent);
-        padding-left: 10px;
-        border-radius: 5px;
     }
     
     .status-success {
-        color: #4ade80;
+        color: #28a745;
         font-weight: bold;
-        text-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
     }
     
     .status-warning {
-        color: #fbbf24;
+        color: #ffc107;
         font-weight: bold;
-        text-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
     }
     
     .status-error {
-        color: #f87171;
+        color: #dc3545;
         font-weight: bold;
-        text-shadow: 0 0 10px rgba(248, 113, 113, 0.3);
     }
     
     .calendar-section {
-        background: linear-gradient(135deg, rgba(30, 58, 95, 0.8), rgba(45, 90, 135, 0.6));
+        background: #f8f9fa;
         padding: 20px;
-        border-radius: 15px;
+        border-radius: 10px;
         margin-bottom: 20px;
-        border: 1px solid rgba(135, 206, 235, 0.3);
-        backdrop-filter: blur(10px);
-        box-shadow: 0 8px 32px rgba(135, 206, 235, 0.1);
+        border-left: 4px solid #2E86AB;
     }
     
     .date-info {
         font-size: 18px;
-        color: #b0e0e6;
+        color: #2E86AB;
         font-weight: 600;
         text-align: center;
         margin-bottom: 10px;
-        text-shadow: 0 0 15px rgba(176, 224, 230, 0.4);
     }
     
-    /* Streamlit widgets dark glacier styling */
-    .stSelectbox > div > div {
-        background: linear-gradient(135deg, rgba(30, 58, 95, 0.9), rgba(45, 90, 135, 0.7));
-        border: 1px solid rgba(135, 206, 235, 0.4);
-        border-radius: 10px;
-        color: #e8f4f8;
-        backdrop-filter: blur(10px);
-    }
-    
-    .stTextInput > div > div > input {
-        background: linear-gradient(135deg, rgba(30, 58, 95, 0.9), rgba(45, 90, 135, 0.7));
-        border: 1px solid rgba(135, 206, 235, 0.4);
-        border-radius: 10px;
-        color: #e8f4f8;
-        backdrop-filter: blur(10px);
-    }
-    
-    .stTextArea > div > div > textarea {
-        background: linear-gradient(135deg, rgba(30, 58, 95, 0.9), rgba(45, 90, 135, 0.7));
-        border: 1px solid rgba(135, 206, 235, 0.4);
-        border-radius: 10px;
-        color: #e8f4f8;
-        backdrop-filter: blur(10px);
-    }
-    
-    /* Style all Streamlit buttons to look like glacier cards */
+    /* Style all Streamlit buttons to look like gradient cards */
     div[data-testid="stButton"] > button[kind="primary"] {
-        background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 25%, #4a90b8 50%, #87ceeb 75%, #b0e0e6 100%) !important;
-        border: 2px solid rgba(135, 206, 235, 0.4) !important;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #ff6b9d 100%) !important;
+        border: none !important;
         border-radius: 25px !important;
-        color: #0f0f23 !important;
+        color: white !important;
         text-align: center !important;
-        box-shadow: 0 15px 35px rgba(135, 206, 235, 0.3), 0 0 25px rgba(176, 224, 230, 0.2) !important;
+        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3) !important;
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
         min-height: 200px !important;
         font-size: 26px !important;
         font-weight: 700 !important;
-        text-shadow: 0 2px 10px rgba(15, 15, 35, 0.3) !important;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2) !important;
         width: 100% !important;
         margin: 10px 0 !important;
-        backdrop-filter: blur(10px) !important;
-        position: relative !important;
-        overflow: hidden !important;
     }
     
     div[data-testid="stButton"] > button[kind="primary"]:hover {
         transform: translateY(-15px) scale(1.03) !important;
-        box-shadow: 0 25px 50px rgba(135, 206, 235, 0.4), 0 0 40px rgba(176, 224, 230, 0.3) !important;
-        background: linear-gradient(135deg, #2d5a87 0%, #4a90b8 25%, #87ceeb 50%, #b0e0e6 75%, #e0f6ff 100%) !important;
-        border: 2px solid rgba(135, 206, 235, 0.8) !important;
+        box-shadow: 0 25px 50px rgba(102, 126, 234, 0.4) !important;
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 50%, #ff6b9d 100%) !important;
     }
     
     div[data-testid="stButton"] > button[kind="primary"]:active {
         transform: translateY(-8px) scale(1.01) !important;
-    }
-    
-    /* Regular buttons styling */
-    div[data-testid="stButton"] > button:not([kind="primary"]) {
-        background: linear-gradient(135deg, rgba(30, 58, 95, 0.9), rgba(45, 90, 135, 0.7)) !important;
-        border: 1px solid rgba(135, 206, 235, 0.4) !important;
-        border-radius: 10px !important;
-        color: #b0e0e6 !important;
-        backdrop-filter: blur(10px) !important;
-        transition: all 0.3s ease !important;
-    }
-    
-    div[data-testid="stButton"] > button:not([kind="primary"]):hover {
-        background: linear-gradient(135deg, rgba(45, 90, 135, 0.9), rgba(74, 144, 184, 0.7)) !important;
-        border: 1px solid rgba(135, 206, 235, 0.8) !important;
-        color: #e0f6ff !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0 8px 25px rgba(135, 206, 235, 0.2) !important;
-    }
-    
-    /* Metrics styling */
-    div[data-testid="metric-container"] {
-        background: linear-gradient(135deg, rgba(30, 58, 95, 0.8), rgba(45, 90, 135, 0.6));
-        border: 1px solid rgba(135, 206, 235, 0.3);
-        border-radius: 15px;
-        padding: 15px;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 8px 32px rgba(135, 206, 235, 0.1);
-    }
-    
-    /* Expander styling */
-    .streamlit-expanderHeader {
-        background: linear-gradient(135deg, rgba(30, 58, 95, 0.8), rgba(45, 90, 135, 0.6)) !important;
-        border: 1px solid rgba(135, 206, 235, 0.3) !important;
-        border-radius: 10px !important;
-        color: #b0e0e6 !important;
-        backdrop-filter: blur(10px) !important;
-    }
-    
-    .streamlit-expanderContent {
-        background: linear-gradient(135deg, rgba(15, 15, 35, 0.9), rgba(26, 26, 46, 0.8)) !important;
-        border: 1px solid rgba(135, 206, 235, 0.2) !important;
-        border-radius: 0 0 10px 10px !important;
-        backdrop-filter: blur(10px) !important;
-    }
-    
-    /* Sidebar styling */
-    .css-1d391kg {
-        background: linear-gradient(180deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%) !important;
-    }
-    
-    /* Info/warning/error messages */
-    .stInfo {
-        background: linear-gradient(135deg, rgba(74, 144, 184, 0.2), rgba(135, 206, 235, 0.1)) !important;
-        border: 1px solid rgba(135, 206, 235, 0.4) !important;
-        border-radius: 10px !important;
-        color: #b0e0e6 !important;
-    }
-    
-    .stWarning {
-        background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(255, 215, 0, 0.1)) !important;
-        border: 1px solid rgba(251, 191, 36, 0.4) !important;
-        border-radius: 10px !important;
-    }
-    
-    .stError {
-        background: linear-gradient(135deg, rgba(248, 113, 113, 0.2), rgba(255, 0, 0, 0.1)) !important;
-        border: 1px solid rgba(248, 113, 113, 0.4) !important;
-        border-radius: 10px !important;
-    }
-    
-    /* Add glacial particle effect */
-    .main::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-image: radial-gradient(2px 2px at 20px 30px, rgba(176, 224, 230, 0.3), transparent),
-                         radial-gradient(2px 2px at 40px 70px, rgba(135, 206, 235, 0.2), transparent),
-                         radial-gradient(1px 1px at 90px 40px, rgba(176, 224, 230, 0.4), transparent),
-                         radial-gradient(1px 1px at 130px 80px, rgba(135, 206, 235, 0.3), transparent),
-                         radial-gradient(2px 2px at 160px 30px, rgba(176, 224, 230, 0.2), transparent);
-        background-repeat: repeat;
-        background-size: 200px 200px;
-        pointer-events: none;
-        z-index: -1;
-        animation: glacialFloat 20s infinite linear;
-    }
-    
-    @keyframes glacialFloat {
-        0% { transform: translateY(0px) translateX(0px); }
-        25% { transform: translateY(-20px) translateX(10px); }
-        50% { transform: translateY(-40px) translateX(-5px); }
-        75% { transform: translateY(-20px) translateX(15px); }
-        100% { transform: translateY(0px) translateX(0px); }
-    }
-    
-    /* Text color adjustments */
-    .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
-        color: #b0e0e6 !important;
-    }
-    
-    .stMarkdown p, .stMarkdown div {
-        color: #e8f4f8 !important;
-    }
-    
-    /* JSON display styling */
-    .stJson {
-        background: linear-gradient(135deg, rgba(15, 15, 35, 0.9), rgba(26, 26, 46, 0.8)) !important;
-        border: 1px solid rgba(135, 206, 235, 0.3) !important;
-        border-radius: 10px !important;
-        backdrop-filter: blur(10px) !important;
     }
 </style>
 """, unsafe_allow_html=True)
