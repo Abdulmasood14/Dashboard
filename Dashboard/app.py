@@ -126,105 +126,41 @@ class CompanyDataProcessor:
         self.load_available_dates()
     
     def load_available_dates(self):
-        """Load available dates by directly checking for CSV files in GitHub repository"""
+        """Load available dates by checking local CSV files or predefined list"""
         try:
-            st.info("Scanning GitHub repository for CSV files...")
-            
-            # Generate date range to check (last 90 days + next 30 days for future dates)
-            end_date = date.today() + timedelta(days=30)
-            start_date = date.today() - timedelta(days=90)
-            
-            available_dates = []
-            current_date = start_date
-            
-            # Use session to reuse connections
-            session = requests.Session()
-            session.headers.update({
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-            })
-            
-            total_days = (end_date - start_date).days
-            progress_bar = st.progress(0)
-            status_text = st.empty()
-            
-            checked_count = 0
-            found_count = 0
-            
-            while current_date <= end_date:
-                # Update progress
-                progress = checked_count / total_days
-                progress_bar.progress(progress)
-                status_text.text(f"Checking {current_date.strftime('%d.%m.%Y')} - Found {found_count} files")
+            # Check if running locally with CSV files
+            if os.path.exists(self.csv_directory):
+                # Local directory exists, scan for CSV files
+                csv_files = glob.glob(os.path.join(self.csv_directory, "*.csv"))
+                dates = []
                 
-                date_str = current_date.strftime("%d.%m.%Y")
-                csv_filename = f"{date_str}.csv"
+                for file_path in csv_files:
+                    filename = os.path.basename(file_path)
+                    date_from_file = self.extract_date_from_filename(filename)
+                    if date_from_file:
+                        dates.append(date_from_file)
                 
-                # Try multiple URL patterns for different repository structures
-                possible_urls = [
-                    f"https://raw.githubusercontent.com/{self.github_repo}/main/{self.csv_directory}/{csv_filename}",
-                    f"https://raw.githubusercontent.com/{self.github_repo}/master/{self.csv_directory}/{csv_filename}",
-                    f"https://raw.githubusercontent.com/{self.github_repo}/main/{csv_filename}",
-                    f"https://raw.githubusercontent.com/{self.github_repo}/master/{csv_filename}"
+                self.available_dates = sorted(list(set(dates)), reverse=True)
+            else:
+                # Use predefined recent dates when files are known to exist
+                # This should be manually updated with actual available dates
+                predefined_dates = [
+                    date(2025, 8, 25),  # Today's example
+                    date(2025, 8, 24),
+                    date(2025, 8, 23),
+                    date(2025, 8, 22),
+                    date(2025, 8, 21),
+                    # Add more dates as files become available
                 ]
-                
-                file_found = False
-                for github_raw_url in possible_urls:
-                    try:
-                        # Check if file exists with HEAD request first (faster)
-                        response = session.head(github_raw_url, timeout=5)
-                        if response.status_code == 200:
-                            # Verify it's actually a CSV with a quick GET request
-                            response = session.get(github_raw_url, timeout=5)
-                            if response.status_code == 200 and len(response.content) > 0:
-                                # Basic validation - check for CSV-like content
-                                content_preview = response.text[:200].lower()
-                                if ('company_name' in content_preview or 
-                                    'extracted_links' in content_preview or 
-                                    'extracted_text' in content_preview or
-                                    ',' in content_preview):  # Basic CSV indicator
-                                    available_dates.append(current_date)
-                                    found_count += 1
-                                    file_found = True
-                                    break
-                    except Exception as e:
-                        # Continue to next URL pattern
-                        continue
-                
-                if file_found:
-                    # Small delay to avoid rate limiting
-                    time.sleep(0.1)
-                
-                current_date += timedelta(days=1)
-                checked_count += 1
-            
-            progress_bar.progress(1.0)
-            status_text.text(f"Scan complete! Found {found_count} CSV files")
-            
-            # Clean up progress indicators after a short delay
-            time.sleep(2)
-            progress_bar.empty()
-            status_text.empty()
-            
-            self.available_dates = sorted(available_dates, reverse=True)
-            session.close()
+                self.available_dates = predefined_dates
             
             if self.available_dates:
-                st.success(f"Found {len(self.available_dates)} available dates!")
-                # Show first few dates found
-                preview_dates = self.available_dates[:5]
-                date_preview = ", ".join([d.strftime("%d.%m.%Y") for d in preview_dates])
-                if len(self.available_dates) > 5:
-                    date_preview += f" ... (and {len(self.available_dates) - 5} more)"
-                st.info(f"Available dates: {date_preview}")
+                st.success(f"Found {len(self.available_dates)} available dates")
             else:
-                st.error("No CSV files found. Please check:")
-                st.error("1. Repository name is correct")
-                st.error("2. CSV files are uploaded to the repository")
-                st.error("3. Files follow the naming pattern: DD.MM.YYYY.csv")
-                st.error(f"4. Files are in '{self.csv_directory}' directory or root directory")
+                st.warning("No dates configured. Please check your setup.")
                 
         except Exception as e:
-            st.error(f"Error discovering dates: {str(e)}")
+            st.error(f"Error loading dates: {str(e)}")
             self.available_dates = []
     
     def extract_date_from_filename(self, filename):
