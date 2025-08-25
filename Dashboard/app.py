@@ -123,112 +123,136 @@ class CompanyDataProcessor:
         self.csv_directory = csv_directory
         self.companies_data = {}
         self.available_dates = []
-        # Cache for storing checked dates to avoid repeated requests
-        self._date_cache = {}
-        self._cache_timestamp = 0
         self.load_available_dates()
     
-    def _get_request_headers(self):
-        """Get headers to bypass caching"""
-        return {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-            'Expires': '0',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-        }
-    
-    def load_available_dates(self, force_refresh=False):
-        """Load available dates by checking file existence directly"""
-        current_time = time.time()
-        
-        # Use cache if it's fresh (less than 5 minutes old) and not forcing refresh
-        if not force_refresh and self._cache_timestamp > 0 and (current_time - self._cache_timestamp) < 300:
-            return
-        
+    def load_available_dates(self):
+        """Load available dates by checking file existence directly with improved detection"""
         try:
-            # Generate a wider date range (last 180 days) to catch more files
-            end_date = date.today()
-            start_date = end_date - timedelta(days=180)
+            st.info("🔍 Scanning GitHub repository for CSV files...")
+            
+            # Generate broader date range to check (last 90 days + next 30 days for future dates)
+            end_date = date.today() + timedelta(days=30)  # Include future dates
+            start_date = date.today() - timedelta(days=90)  # Go back 90 days
             
             available_dates = []
             current_date = start_date
             
-            # Add progress indicator for longer operations
-            progress_placeholder = st.empty()
+            # Use session to reuse connections
+            session = requests.Session()
+            session.headers.update({
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            })
             
-            total_days = (end_date - start_date).days + 1
-            checked_days = 0
+            total_days = (end_date - start_date).days
+            progress_bar = st.progress(0)
+            status_text = st.empty()
+            
+            checked_count = 0
+            found_count = 0
             
             while current_date <= end_date:
+                # Update progress
+                progress = checked_count / total_days
+                progress_bar.progress(progress)
+                status_text.text(f"Checking {current_date.strftime('%d.%m.%Y')} - Found {found_count} files")
+                
                 date_str = current_date.strftime("%d.%m.%Y")
                 csv_filename = f"{date_str}.csv"
-                github_raw_url = f"https://raw.githubusercontent.com/{self.github_repo}/master/{self.csv_directory}/{csv_filename}"
                 
-                # Add timestamp to URL to bypass caching
-                cache_buster = f"?t={int(time.time())}"
-                github_raw_url += cache_buster
+                # Try multiple URL patterns - GitHub might have different structures
+                possible_urls = [
+                    f"https://raw.githubusercontent.com/{self.github_repo}/main/{self.csv_directory}/{csv_filename}",
+                    f"https://raw.githubusercontent.com/{self.github_repo}/master/{self.csv_directory}/{csv_filename}",
+                    f"https://raw.githubusercontent.com/{self.github_repo}/main/{csv_filename}",
+                    f"https://raw.githubusercontent.com/{self.github_repo}/master/{csv_filename}"
+                ]
                 
-                try:
-                    # Quick HEAD request to check if file exists
-                    response = requests.head(
-                        github_raw_url, 
-                        timeout=5, 
-                        headers=self._get_request_headers(),
-                        allow_redirects=True
-                    )
-                    if response.status_code == 200:
-                        available_dates.append(current_date)
-                        
-                except requests.RequestException:
-                    pass  # File doesn't exist or request failed
+                file_found = False
+                for github_raw_url in possible_urls:
+                    try:
+                        # Use GET request with small timeout and check content
+                        response = session.get(github_raw_url, timeout=5)
+                        if response.status_code == 200 and len(response.content) > 0:
+                            # Additional check: make sure it's actually CSV content
+                            content_preview = response.text[:100].lower()
+                            if 'company_name' in content_preview or 'csv' in response.headers.get('content-type', '').lower() or len(response.text.strip()) > 10:
+                                available_dates.append(current_date)
+                                found_count += 1
+                                file_found = True
+                                break
+                    except Exception as e:
+                        # Continue to next URL pattern
+                        continue
+                
+                if file_found:
+                    # Small delay to avoid rate limiting
+                    time.sleep(0.1)
                 
                 current_date += timedelta(days=1)
-                checked_days += 1
-                
-                # Update progress every 10 days
-                if checked_days % 10 == 0:
-                    progress_placeholder.text(f"Checking dates... {checked_days}/{total_days}")
+                checked_count += 1
             
-            progress_placeholder.empty()
+            progress_bar.progress(1.0)
+            status_text.text(f"✅ Scan complete! Found {found_count} CSV files")
+            
+            # Clean up progress indicators after a short delay
+            time.sleep(2)
+            progress_bar.empty()
+            status_text.empty()
             
             self.available_dates = sorted(available_dates, reverse=True)
-            self._cache_timestamp = current_time
             
-            # If no dates found, try some recent fallback dates
+            # If still no dates found, try some recent fallback dates with extended checking
             if not self.available_dates:
-                st.warning("No recent files found. Checking specific fallback dates...")
-                fallback_dates = [
-                    date.today(),
-                    date.today() - timedelta(days=1),
-                    date.today() - timedelta(days=2),
-                    date.today() - timedelta(days=3),
-                    date(2025, 1, 15),
-                    date(2025, 1, 14),
-                    date(2025, 1, 13),
-                    date(2024, 12, 31),
-                    date(2024, 12, 30),
-                ]
+                st.warning("No files found in date range scan. Trying recent fallback dates...")
+                
+                fallback_dates = []
+                today = date.today()
+                for i in range(30):  # Try last 30 days
+                    fallback_dates.append(today - timedelta(days=i))
                 
                 for check_date in fallback_dates:
                     date_str = check_date.strftime("%d.%m.%Y")
                     csv_filename = f"{date_str}.csv"
-                    github_raw_url = f"https://raw.githubusercontent.com/{self.github_repo}/master/{self.csv_directory}/{csv_filename}?t={int(time.time())}"
                     
-                    try:
-                        response = requests.head(
-                            github_raw_url, 
-                            timeout=5, 
-                            headers=self._get_request_headers()
-                        )
-                        if response.status_code == 200:
-                            available_dates.append(check_date)
-                    except requests.RequestException:
-                        pass
+                    possible_urls = [
+                        f"https://raw.githubusercontent.com/{self.github_repo}/main/{self.csv_directory}/{csv_filename}",
+                        f"https://raw.githubusercontent.com/{self.github_repo}/master/{self.csv_directory}/{csv_filename}",
+                        f"https://raw.githubusercontent.com/{self.github_repo}/main/{csv_filename}",
+                        f"https://raw.githubusercontent.com/{self.github_repo}/master/{csv_filename}"
+                    ]
+                    
+                    for github_raw_url in possible_urls:
+                        try:
+                            response = session.get(github_raw_url, timeout=5)
+                            if response.status_code == 200 and len(response.content) > 0:
+                                content_preview = response.text[:100].lower()
+                                if 'company_name' in content_preview or len(response.text.strip()) > 10:
+                                    available_dates.append(check_date)
+                                    break
+                        except:
+                            continue
                 
-                self.available_dates = sorted(available_dates, reverse=True)
+                self.available_dates = sorted(list(set(available_dates)), reverse=True)
+            
+            session.close()
+            
+            if self.available_dates:
+                st.success(f"✅ Found {len(self.available_dates)} available dates!")
+                # Show first few dates found
+                preview_dates = self.available_dates[:5]
+                date_preview = ", ".join([d.strftime("%d.%m.%Y") for d in preview_dates])
+                if len(self.available_dates) > 5:
+                    date_preview += f" ... (and {len(self.available_dates) - 5} more)"
+                st.info(f"📅 Available dates: {date_preview}")
+            else:
+                st.error("❌ No CSV files found. Please check:")
+                st.error("1. Repository name is correct")
+                st.error("2. CSV files are uploaded to the repository")
+                st.error("3. Files follow the naming pattern: DD.MM.YYYY.csv")
+                st.error(f"4. Files are in '{self.csv_directory}' directory or root directory")
                 
         except Exception as e:
-            st.error(f"Error discovering dates: {str(e)}")
+            st.error(f"❌ Error discovering dates: {str(e)}")
             self.available_dates = []
     
     def extract_date_from_filename(self, filename):
@@ -247,28 +271,26 @@ class CompanyDataProcessor:
         return None
     
     def load_company_data_for_date(self, selected_date):
-        """Load company data for specific date from GitHub using direct URL"""
+        """Load company data for specific date from GitHub using direct URL with improved error handling"""
         if not selected_date:
             return
         
-        # Construct GitHub raw URL for the CSV file
+        # Try multiple URL patterns to find the file
         date_str = selected_date.strftime("%d.%m.%Y")
         csv_filename = f"{date_str}.csv"
         
-        # Add cache buster to force fresh data
-        cache_buster = f"?t={int(time.time())}&r={hash(str(selected_date))}"
-        github_raw_url = f"https://raw.githubusercontent.com/{self.github_repo}/master/{self.csv_directory}/{csv_filename}{cache_buster}"
+        possible_urls = [
+            f"https://raw.githubusercontent.com/{self.github_repo}/main/{self.csv_directory}/{csv_filename}",
+            f"https://raw.githubusercontent.com/{self.github_repo}/master/{self.csv_directory}/{csv_filename}",
+            f"https://raw.githubusercontent.com/{self.github_repo}/main/{csv_filename}",
+            f"https://raw.githubusercontent.com/{self.github_repo}/master/{csv_filename}"
+        ]
         
-        try:
-            with st.spinner(f"Loading data for {date_str}..."):
+        for github_raw_url in possible_urls:
+            try:
                 # Download CSV from GitHub
-                response = requests.get(
-                    github_raw_url, 
-                    timeout=15,
-                    headers=self._get_request_headers()
-                )
-                
-                if response.status_code == 200:
+                response = requests.get(github_raw_url, timeout=15)
+                if response.status_code == 200 and len(response.content) > 0:
                     # Read CSV content
                     csv_content = StringIO(response.text)
                     df = pd.read_csv(csv_content)
@@ -278,7 +300,7 @@ class CompanyDataProcessor:
                     if not all(col in df.columns for col in required_columns):
                         st.error(f"CSV file must contain columns: {required_columns}")
                         st.error(f"Found columns: {list(df.columns)}")
-                        return
+                        continue
                     
                     # Process the data
                     companies_data = {}
@@ -286,7 +308,7 @@ class CompanyDataProcessor:
                     for index, row in df.iterrows():
                         company_name = str(row['Company_Name']).strip().upper()
                         
-                        if company_name and company_name != 'NAN' and pd.notna(company_name):
+                        if company_name and company_name != 'NAN':
                             companies_data[company_name] = {
                                 'company_name': company_name,
                                 'extracted_links': str(row['Extracted_Links']) if pd.notna(row['Extracted_Links']) else '',
@@ -297,23 +319,19 @@ class CompanyDataProcessor:
                             }
                     
                     self.companies_data = companies_data
-                    st.success(f"Successfully loaded {len(companies_data)} companies from {date_str}")
+                    st.success(f"✅ Successfully loaded data for {date_str} from: {github_raw_url}")
+                    return
                     
-                elif response.status_code == 404:
-                    st.error(f"CSV file for {date_str} not found in GitHub repository")
-                    st.info("Please check if the file has been uploaded correctly to GitHub")
-                    self.companies_data = {}
-                else:
-                    st.error(f"Failed to download CSV file for {date_str} from GitHub (Status: {response.status_code})")
-                    st.info(f"Response: {response.text[:200]}...")
-                    self.companies_data = {}
-                    
-        except requests.Timeout:
-            st.error(f"Timeout while loading data for {date_str}. Please try again.")
-            self.companies_data = {}
-        except Exception as e:
-            st.error(f"Error loading data for {date_str}: {str(e)}")
-            self.companies_data = {}
+            except Exception as e:
+                st.warning(f"⚠️ Failed to load from {github_raw_url}: {str(e)}")
+                continue
+        
+        # If we reach here, none of the URLs worked
+        st.error(f"❌ Failed to download CSV file for {date_str} from any location")
+        st.error("Tried the following URLs:")
+        for url in possible_urls:
+            st.code(url)
+        self.companies_data = {}
     
     def get_companies_list(self):
         """Get list of all companies for selected date"""
@@ -364,12 +382,6 @@ def main():
     # Sidebar navigation
     st.sidebar.title("Navigation")
     
-    # Add refresh button in sidebar
-    if st.sidebar.button("🔄 Refresh Data", help="Refresh available dates from GitHub"):
-        processor.load_available_dates(force_refresh=True)
-        st.sidebar.success("Data refreshed!")
-        st.rerun()
-    
     # Handle button clicks from dashboard
     if st.session_state.get('selected_company'):
         st.session_state.page = "Company Details"
@@ -388,27 +400,35 @@ def show_dashboard(processor):
     """Display main dashboard with company cards"""
     st.markdown("<h1 class='main-header'>News Dashboard</h1>", unsafe_allow_html=True)
     
+    # Debug section in sidebar
+    with st.sidebar:
+        st.markdown("---")
+        st.markdown("**Debug Info**")
+        if st.button("🔄 Refresh Available Dates"):
+            processor.load_available_dates()
+            st.rerun()
+        
+        st.markdown(f"**Repository:** {processor.github_repo}")
+        st.markdown(f"**CSV Directory:** {processor.csv_directory}")
+        st.markdown(f"**Available Dates:** {len(processor.available_dates)}")
+    
     # Calendar Section
     st.markdown("<div class='calendar-section'>", unsafe_allow_html=True)
     st.markdown("### Select Date")
-    
-    # Add refresh button at the top
-    col_refresh, col_empty = st.columns([1, 4])
-    with col_refresh:
-        if st.button("🔄 Refresh Dates"):
-            processor.load_available_dates(force_refresh=True)
-            st.success("Dates refreshed!")
-            st.rerun()
     
     available_dates = processor.get_available_dates()
     
     if not available_dates:
         st.warning("No CSV files found in the GitHub repository.")
-        st.info("Tips:")
-        st.info("1. Make sure your CSV files are uploaded to the correct GitHub repository")
-        st.info("2. Check that files are named in DD.MM.YYYY.csv format")
-        st.info("3. Wait a few minutes after uploading for GitHub CDN to update")
-        st.info("4. Try clicking the 'Refresh Dates' button above")
+        st.info("**Troubleshooting Steps:**")
+        st.info("1. Make sure your CSV files are uploaded to GitHub")
+        st.info("2. Check that files follow naming pattern: DD.MM.YYYY.csv (e.g., 25.08.2025.csv)")
+        st.info(f"3. Verify files are in '{processor.csv_directory}' directory or root directory")
+        st.info("4. Wait a few minutes after uploading before refreshing")
+        
+        if st.button("🔄 Try Again"):
+            st.rerun()
+        
         st.markdown("</div>", unsafe_allow_html=True)
         return
     
@@ -478,7 +498,6 @@ def show_dashboard(processor):
         
         if not companies:
             st.info(f"No company data found for {st.session_state.selected_date.strftime('%d.%m.%Y')}")
-            st.info("The file might exist but contain no valid company data.")
             return
         
         # Show only total companies metric
