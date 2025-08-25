@@ -298,17 +298,7 @@ def show_dashboard(processor):
     """Display main dashboard with company cards"""
     st.markdown("<h1 class='main-header'>News Dashboard</h1>", unsafe_allow_html=True)
     
-    # Debug section in sidebar
-    with st.sidebar:
-        st.markdown("---")
-        st.markdown("**Debug Info**")
-        if st.button("Refresh Available Dates"):
-            processor.load_available_dates()
-            st.rerun()
-        
-        st.markdown(f"**Repository:** {processor.github_repo}")
-        st.markdown(f"**CSV Directory:** {processor.csv_directory}")
-        st.markdown(f"**Available Dates:** {len(processor.available_dates)}")
+
     
     # Calendar Section
     st.markdown("<div class='calendar-section'>", unsafe_allow_html=True)
