@@ -18,586 +18,103 @@ st.set_page_config(
 # Custom CSS for better styling
 st.markdown("""
 <style>
-    /* Global styling */
-    .stApp {
-        background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%);
-        background-attachment: fixed;
-    }
-    
-    /* Main container styling */
-    .main .block-container {
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(20px);
-        border-radius: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 2rem;
-        margin: 1rem 0;
-        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
-    }
-    
-    /* Sidebar styling */
-    .css-1d391kg {
-        background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .css-1d391kg .stSelectbox label {
-        color: #ffffff !important;
-        font-weight: 600;
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-    }
-    
-    /* Enhanced company cards with neon effects */
     .company-card {
-        background: linear-gradient(135deg, 
-            rgba(102, 126, 234, 0.9) 0%, 
-            rgba(118, 75, 162, 0.9) 25%,
-            rgba(255, 107, 157, 0.9) 50%,
-            rgba(64, 224, 208, 0.9) 75%,
-            rgba(138, 43, 226, 0.9) 100%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #ff6b9d 100%);
         border-radius: 25px;
         color: white;
         text-align: center;
-        box-shadow: 
-            0 20px 40px rgba(102, 126, 234, 0.4),
-            0 0 30px rgba(255, 107, 157, 0.2),
-            inset 0 1px 0 rgba(255, 255, 255, 0.2);
-        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        min-height: 220px;
-        font-size: 28px;
-        font-weight: 800;
-        text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        min-height: 200px;
+        font-size: 26px;
+        font-weight: 700;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         position: relative;
         overflow: hidden;
         padding: 60px 20px;
         cursor: pointer;
-        border: 2px solid rgba(255, 255, 255, 0.1);
-        margin: 15px 0;
-        backdrop-filter: blur(10px);
-    }
-    
-    .company-card::before {
-        content: '';
-        position: absolute;
-        top: -2px;
-        left: -2px;
-        right: -2px;
-        bottom: -2px;
-        background: linear-gradient(45deg, #ff6b9d, #c471ed, #12c2e9, #c471ed, #ff6b9d);
-        border-radius: 25px;
-        z-index: -1;
-        animation: borderGlow 3s ease-in-out infinite alternate;
-    }
-    
-    @keyframes borderGlow {
-        0% { opacity: 0.5; transform: scale(1); }
-        100% { opacity: 1; transform: scale(1.02); }
+        border: none;
+        margin: 10px 0;
     }
     
     .company-card:hover {
-        transform: translateY(-20px) scale(1.05) rotateX(5deg);
-        box-shadow: 
-            0 35px 70px rgba(102, 126, 234, 0.6),
-            0 0 50px rgba(255, 107, 157, 0.4),
-            0 0 100px rgba(64, 224, 208, 0.2);
-        background: linear-gradient(135deg, 
-            rgba(118, 75, 162, 1) 0%, 
-            rgba(255, 107, 157, 1) 25%,
-            rgba(64, 224, 208, 1) 50%,
-            rgba(138, 43, 226, 1) 75%,
-            rgba(102, 126, 234, 1) 100%);
-        text-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
+        transform: translateY(-15px) scale(1.03);
+        box-shadow: 0 25px 50px rgba(102, 126, 234, 0.4);
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 50%, #ff6b9d 100%);
     }
     
-    /* Animated header */
     .main-header {
         text-align: center;
-        background: linear-gradient(45deg, #667eea, #764ba2, #ff6b9d, #40e0d0);
-        background-size: 300% 300%;
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        animation: gradientShift 4s ease-in-out infinite;
-        font-size: 3.5rem;
-        font-weight: 900;
+        color: #2E86AB;
         margin-bottom: 30px;
-        text-shadow: 0 0 30px rgba(102, 126, 234, 0.5);
-        letter-spacing: 2px;
     }
     
-    @keyframes gradientShift {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
-    
-    /* Enhanced section headers */
     .section-header {
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #ff6b9d 100%);
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        border-bottom: 3px solid;
-        border-image: linear-gradient(90deg, #667eea, #764ba2, #ff6b9d) 1;
-        padding-bottom: 10px;
-        margin-top: 30px;
-        margin-bottom: 20px;
-        font-weight: 700;
-        font-size: 1.8rem;
-        position: relative;
+        color: #2E86AB;
+        border-bottom: 2px solid #2E86AB;
+        padding-bottom: 5px;
+        margin-top: 20px;
+        margin-bottom: 15px;
     }
     
-    .section-header::after {
-        content: '';
-        position: absolute;
-        bottom: -3px;
-        left: 0;
-        width: 100%;
-        height: 3px;
-        background: linear-gradient(90deg, #667eea, #764ba2, #ff6b9d);
-        border-radius: 2px;
-        animation: pulseGlow 2s ease-in-out infinite alternate;
-    }
-    
-    @keyframes pulseGlow {
-        0% { opacity: 0.6; box-shadow: 0 0 5px rgba(102, 126, 234, 0.3); }
-        100% { opacity: 1; box-shadow: 0 0 20px rgba(255, 107, 157, 0.6); }
-    }
-    
-    /* Enhanced status indicators */
     .status-success {
-        color: #00ff88;
+        color: #28a745;
         font-weight: bold;
-        text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
     }
     
     .status-warning {
-        color: #ffaa00;
+        color: #ffc107;
         font-weight: bold;
-        text-shadow: 0 0 10px rgba(255, 170, 0, 0.5);
     }
     
     .status-error {
-        color: #ff4757;
+        color: #dc3545;
         font-weight: bold;
-        text-shadow: 0 0 10px rgba(255, 71, 87, 0.5);
     }
     
-    /* Enhanced calendar section */
     .calendar-section {
-        background: linear-gradient(135deg, 
-            rgba(255, 255, 255, 0.1) 0%, 
-            rgba(255, 255, 255, 0.05) 100%);
-        backdrop-filter: blur(20px);
-        padding: 30px;
-        border-radius: 20px;
-        margin-bottom: 30px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 
-            0 20px 40px rgba(0, 0, 0, 0.2),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .calendar-section::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, 
-            transparent 0%, 
-            rgba(255, 255, 255, 0.1) 50%, 
-            transparent 100%);
-        animation: shimmer 3s infinite;
-    }
-    
-    @keyframes shimmer {
-        0% { left: -100%; }
-        100% { left: 100%; }
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border-left: 4px solid #2E86AB;
     }
     
     .date-info {
-        font-size: 22px;
-        background: linear-gradient(45deg, #667eea, #764ba2, #ff6b9d);
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-weight: 700;
+        font-size: 18px;
+        color: #2E86AB;
+        font-weight: 600;
         text-align: center;
-        margin-bottom: 15px;
-        text-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
-        letter-spacing: 1px;
+        margin-bottom: 10px;
     }
     
-    /* Enhanced Streamlit buttons */
+    /* Style all Streamlit buttons to look like gradient cards */
     div[data-testid="stButton"] > button[kind="primary"] {
-        background: linear-gradient(135deg, 
-            rgba(102, 126, 234, 0.9) 0%, 
-            rgba(118, 75, 162, 0.9) 25%,
-            rgba(255, 107, 157, 0.9) 50%,
-            rgba(64, 224, 208, 0.9) 75%,
-            rgba(138, 43, 226, 0.9) 100%) !important;
-        border: 2px solid rgba(255, 255, 255, 0.2) !important;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #ff6b9d 100%) !important;
+        border: none !important;
         border-radius: 25px !important;
         color: white !important;
         text-align: center !important;
-        box-shadow: 
-            0 20px 40px rgba(102, 126, 234, 0.4),
-            0 0 30px rgba(255, 107, 157, 0.2),
-            inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
-        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        min-height: 220px !important;
-        font-size: 28px !important;
-        font-weight: 800 !important;
-        text-shadow: 0 0 20px rgba(255, 255, 255, 0.5) !important;
+        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3) !important;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        min-height: 200px !important;
+        font-size: 26px !important;
+        font-weight: 700 !important;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2) !important;
         width: 100% !important;
-        margin: 15px 0 !important;
-        backdrop-filter: blur(10px) !important;
-        position: relative !important;
-        overflow: hidden !important;
-    }
-    
-    div[data-testid="stButton"] > button[kind="primary"]::before {
-        content: '' !important;
-        position: absolute !important;
-        top: -2px !important;
-        left: -2px !important;
-        right: -2px !important;
-        bottom: -2px !important;
-        background: linear-gradient(45deg, #ff6b9d, #c471ed, #12c2e9, #c471ed, #ff6b9d) !important;
-        border-radius: 25px !important;
-        z-index: -1 !important;
-        animation: borderGlow 3s ease-in-out infinite alternate !important;
+        margin: 10px 0 !important;
     }
     
     div[data-testid="stButton"] > button[kind="primary"]:hover {
-        transform: translateY(-20px) scale(1.05) rotateX(5deg) !important;
-        box-shadow: 
-            0 35px 70px rgba(102, 126, 234, 0.6),
-            0 0 50px rgba(255, 107, 157, 0.4),
-            0 0 100px rgba(64, 224, 208, 0.2) !important;
-        background: linear-gradient(135deg, 
-            rgba(118, 75, 162, 1) 0%, 
-            rgba(255, 107, 157, 1) 25%,
-            rgba(64, 224, 208, 1) 50%,
-            rgba(138, 43, 226, 1) 75%,
-            rgba(102, 126, 234, 1) 100%) !important;
-        text-shadow: 0 0 30px rgba(255, 255, 255, 0.8) !important;
+        transform: translateY(-15px) scale(1.03) !important;
+        box-shadow: 0 25px 50px rgba(102, 126, 234, 0.4) !important;
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 50%, #ff6b9d 100%) !important;
     }
     
     div[data-testid="stButton"] > button[kind="primary"]:active {
-        transform: translateY(-10px) scale(1.02) !important;
-    }
-    
-    /* Enhanced metrics */
-    div[data-testid="metric-container"] {
-        background: linear-gradient(135deg, 
-            rgba(255, 255, 255, 0.1) 0%, 
-            rgba(255, 255, 255, 0.05) 100%);
-        backdrop-filter: blur(15px);
-        border-radius: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        padding: 25px;
-        margin: 10px;
-        box-shadow: 
-            0 15px 35px rgba(0, 0, 0, 0.2),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        transition: all 0.3s ease;
-    }
-    
-    div[data-testid="metric-container"]:hover {
-        transform: translateY(-5px);
-        box-shadow: 
-            0 25px 50px rgba(0, 0, 0, 0.3),
-            0 0 30px rgba(102, 126, 234, 0.2);
-    }
-    
-    div[data-testid="metric-container"] [data-testid="metric-value"] {
-        color: #00ff88 !important;
-        font-size: 2.5rem !important;
-        font-weight: 900 !important;
-        text-shadow: 0 0 20px rgba(0, 255, 136, 0.5) !important;
-        background: linear-gradient(45deg, #00ff88, #40e0d0, #667eea);
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-    
-    div[data-testid="metric-container"] [data-testid="metric-label"] {
-        color: rgba(255, 255, 255, 0.9) !important;
-        font-weight: 600 !important;
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.3) !important;
-        font-size: 1.1rem !important;
-    }
-    
-    /* Enhanced selectbox styling */
-    .stSelectbox > div > div {
-        background: linear-gradient(135deg, 
-            rgba(255, 255, 255, 0.1) 0%, 
-            rgba(255, 255, 255, 0.05) 100%) !important;
-        backdrop-filter: blur(15px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-radius: 15px !important;
-        color: white !important;
-    }
-    
-    .stSelectbox label {
-        color: white !important;
-        font-weight: 600 !important;
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.3) !important;
-        font-size: 1.1rem !important;
-    }
-    
-    /* Enhanced date input */
-    .stDateInput > div > div > input {
-        background: linear-gradient(135deg, 
-            rgba(255, 255, 255, 0.1) 0%, 
-            rgba(255, 255, 255, 0.05) 100%) !important;
-        backdrop-filter: blur(15px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-radius: 15px !important;
-        color: white !important;
-    }
-    
-    .stDateInput label {
-        color: white !important;
-        font-weight: 600 !important;
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.3) !important;
-    }
-    
-    /* Enhanced text input */
-    .stTextInput > div > div > input {
-        background: linear-gradient(135deg, 
-            rgba(255, 255, 255, 0.1) 0%, 
-            rgba(255, 255, 255, 0.05) 100%) !important;
-        backdrop-filter: blur(15px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-radius: 15px !important;
-        color: white !important;
-        font-weight: 500 !important;
-    }
-    
-    .stTextInput label {
-        color: white !important;
-        font-weight: 600 !important;
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.3) !important;
-    }
-    
-    /* Enhanced text area */
-    .stTextArea textarea {
-        background: linear-gradient(135deg, 
-            rgba(255, 255, 255, 0.1) 0%, 
-            rgba(255, 255, 255, 0.05) 100%) !important;
-        backdrop-filter: blur(15px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-radius: 15px !important;
-        color: white !important;
-        font-weight: 500 !important;
-    }
-    
-    .stTextArea label {
-        color: white !important;
-        font-weight: 600 !important;
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.3) !important;
-    }
-    
-    /* Enhanced expandable sections */
-    .streamlit-expanderHeader {
-        background: linear-gradient(135deg, 
-            rgba(102, 126, 234, 0.2) 0%, 
-            rgba(255, 107, 157, 0.2) 100%) !important;
-        border-radius: 15px !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        color: white !important;
-        font-weight: 600 !important;
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.3) !important;
-    }
-    
-    .streamlit-expanderContent {
-        background: linear-gradient(135deg, 
-            rgba(255, 255, 255, 0.05) 0%, 
-            rgba(255, 255, 255, 0.02) 100%) !important;
-        backdrop-filter: blur(10px) !important;
-        border-radius: 15px !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        padding: 20px !important;
-        margin-top: 10px !important;
-    }
-    
-    /* Enhanced warning and info messages */
-    .stAlert {
-        backdrop-filter: blur(15px) !important;
-        border-radius: 15px !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    }
-    
-    .stWarning {
-        background: linear-gradient(135deg, 
-            rgba(255, 170, 0, 0.2) 0%, 
-            rgba(255, 170, 0, 0.1) 100%) !important;
-        color: #ffaa00 !important;
-    }
-    
-    .stInfo {
-        background: linear-gradient(135deg, 
-            rgba(102, 126, 234, 0.2) 0%, 
-            rgba(102, 126, 234, 0.1) 100%) !important;
-        color: #667eea !important;
-    }
-    
-    .stError {
-        background: linear-gradient(135deg, 
-            rgba(255, 71, 87, 0.2) 0%, 
-            rgba(255, 71, 87, 0.1) 100%) !important;
-        color: #ff4757 !important;
-    }
-    
-    /* Enhanced download buttons */
-    div[data-testid="stDownloadButton"] > button {
-        background: linear-gradient(135deg, #00ff88 0%, #40e0d0 50%, #667eea 100%) !important;
-        border: none !important;
-        border-radius: 15px !important;
-        color: white !important;
-        font-weight: 600 !important;
-        padding: 12px 25px !important;
-        box-shadow: 0 10px 25px rgba(0, 255, 136, 0.3) !important;
-        transition: all 0.3s ease !important;
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.3) !important;
-    }
-    
-    div[data-testid="stDownloadButton"] > button:hover {
-        transform: translateY(-3px) !important;
-        box-shadow: 0 15px 35px rgba(0, 255, 136, 0.4) !important;
-        background: linear-gradient(135deg, #40e0d0 0%, #667eea 50%, #00ff88 100%) !important;
-    }
-    
-    /* Enhanced regular buttons */
-    div[data-testid="stButton"] > button:not([kind="primary"]) {
-        background: linear-gradient(135deg, 
-            rgba(255, 255, 255, 0.1) 0%, 
-            rgba(255, 255, 255, 0.05) 100%) !important;
-        backdrop-filter: blur(15px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-radius: 15px !important;
-        color: white !important;
-        font-weight: 600 !important;
-        padding: 12px 25px !important;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
-        transition: all 0.3s ease !important;
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.3) !important;
-    }
-    
-    div[data-testid="stButton"] > button:not([kind="primary"]):hover {
-        transform: translateY(-3px) !important;
-        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3) !important;
-        background: linear-gradient(135deg, 
-            rgba(102, 126, 234, 0.2) 0%, 
-            rgba(255, 107, 157, 0.2) 100%) !important;
-    }
-    
-    /* Enhanced markdown content */
-    .stMarkdown {
-        color: rgba(255, 255, 255, 0.9) !important;
-    }
-    
-    .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
-        color: white !important;
-        text-shadow: 0 0 15px rgba(255, 255, 255, 0.3) !important;
-    }
-    
-    /* Enhanced JSON display */
-    .stJson {
-        background: linear-gradient(135deg, 
-            rgba(255, 255, 255, 0.05) 0%, 
-            rgba(255, 255, 255, 0.02) 100%) !important;
-        backdrop-filter: blur(10px) !important;
-        border-radius: 15px !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        padding: 20px !important;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
-    }
-    
-    /* Floating particles effect */
-    .particle {
-        position: fixed;
-        border-radius: 50%;
-        pointer-events: none;
-        animation: float 6s ease-in-out infinite;
-        z-index: -1;
-    }
-    
-    @keyframes float {
-        0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.7; }
-        50% { transform: translateY(-20px) rotate(180deg); opacity: 1; }
-    }
-    
-    /* Scrollbar styling */
-    ::-webkit-scrollbar {
-        width: 8px;
-    }
-    
-    ::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 10px;
-    }
-    
-    ::-webkit-scrollbar-thumb {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #ff6b9d 100%);
-        border-radius: 10px;
-    }
-    
-    ::-webkit-scrollbar-thumb:hover {
-        background: linear-gradient(135deg, #764ba2 0%, #ff6b9d 50%, #667eea 100%);
-    }
-    
-    /* Enhanced divider */
-    hr {
-        border: none;
-        height: 2px;
-        background: linear-gradient(90deg, 
-            transparent 0%, 
-            rgba(102, 126, 234, 0.5) 25%, 
-            rgba(255, 107, 157, 0.8) 50%, 
-            rgba(64, 224, 208, 0.5) 75%, 
-            transparent 100%);
-        margin: 30px 0;
-        border-radius: 1px;
-    }
-    
-    /* Floating icons effect */
-    .floating-icon {
-        position: fixed;
-        font-size: 20px;
-        opacity: 0.1;
-        animation: floatIcon 8s linear infinite;
-        z-index: -1;
-        color: #667eea;
-    }
-    
-    @keyframes floatIcon {
-        0% { transform: translateY(100vh) rotate(0deg); }
-        100% { transform: translateY(-100px) rotate(360deg); }
+        transform: translateY(-8px) scale(1.01) !important;
     }
 </style>
-
-<!-- Add floating particles -->
-<div class="particle" style="top: 10%; left: 10%; width: 4px; height: 4px; background: #667eea; animation-delay: 0s;"></div>
-<div class="particle" style="top: 20%; left: 80%; width: 6px; height: 6px; background: #ff6b9d; animation-delay: 2s;"></div>
-<div class="particle" style="top: 60%; left: 20%; width: 3px; height: 3px; background: #40e0d0; animation-delay: 4s;"></div>
-<div class="particle" style="top: 80%; left: 70%; width: 5px; height: 5px; background: #764ba2; animation-delay: 1s;"></div>
-<div class="particle" style="top: 40%; left: 90%; width: 4px; height: 4px; background: #c471ed; animation-delay: 3s;"></div>
-
-<!-- Add floating icons -->
-<div class="floating-icon" style="left: 5%; animation-delay: 0s;">📊</div>
-<div class="floating-icon" style="left: 15%; animation-delay: 2s;">📈</div>
-<div class="floating-icon" style="left: 85%; animation-delay: 4s;">📰</div>
-<div class="floating-icon" style="left: 95%; animation-delay: 6s;">💼</div>
-<div class="floating-icon" style="left: 25%; animation-delay: 1s;">🚀</div>
-<div class="floating-icon" style="left: 75%; animation-delay: 5s;">💡</div>
-
 """, unsafe_allow_html=True)
 
 class CompanyDataProcessor:
