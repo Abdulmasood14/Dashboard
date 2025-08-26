@@ -15,208 +15,104 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for glacier dark theme
+# Custom CSS for better styling
 st.markdown("""
 <style>
     .company-card {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #334155 50%, #475569 75%, #64748b 100%);
-        border: 2px solid rgba(148, 163, 184, 0.3);
-        border-radius: 20px;
-        color: #e2e8f0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #ff6b9d 100%);
+        border-radius: 25px;
+        color: white;
         text-align: center;
-        box-shadow: 
-            0 0 20px rgba(148, 163, 184, 0.2),
-            inset 0 0 20px rgba(148, 163, 184, 0.1),
-            0 10px 25px rgba(15, 23, 42, 0.5);
+        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3);
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         min-height: 200px;
         font-size: 26px;
         font-weight: 700;
-        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         position: relative;
         overflow: hidden;
         padding: 60px 20px;
         cursor: pointer;
+        border: none;
         margin: 10px 0;
-        backdrop-filter: blur(10px);
-    }
-    
-    .company-card:before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(148, 163, 184, 0.1) 0%, transparent 70%);
-        transform: rotate(45deg);
-        transition: all 0.6s ease;
-        opacity: 0;
     }
     
     .company-card:hover {
         transform: translateY(-15px) scale(1.03);
-        box-shadow: 
-            0 0 30px rgba(148, 163, 184, 0.4),
-            inset 0 0 30px rgba(148, 163, 184, 0.2),
-            0 20px 40px rgba(15, 23, 42, 0.7);
-        background: linear-gradient(135deg, #1e293b 0%, #334155 25%, #475569 50%, #64748b 75%, #94a3b8 100%);
-        border-color: rgba(148, 163, 184, 0.6);
-        color: #f1f5f9;
-    }
-    
-    .company-card:hover:before {
-        opacity: 1;
-        animation: glacierShimmer 2s infinite;
-    }
-    
-    @keyframes glacierShimmer {
-        0% { transform: rotate(45deg) translateX(-100%); }
-        100% { transform: rotate(45deg) translateX(100%); }
+        box-shadow: 0 25px 50px rgba(102, 126, 234, 0.4);
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 50%, #ff6b9d 100%);
     }
     
     .main-header {
         text-align: center;
-        color: #94a3b8;
+        color: #2E86AB;
         margin-bottom: 30px;
-        text-shadow: 0 0 10px rgba(148, 163, 184, 0.5);
     }
     
     .section-header {
-        color: #cbd5e1;
-        border-bottom: 2px solid rgba(148, 163, 184, 0.5);
+        color: #2E86AB;
+        border-bottom: 2px solid #2E86AB;
         padding-bottom: 5px;
         margin-top: 20px;
         margin-bottom: 15px;
-        text-shadow: 0 0 5px rgba(148, 163, 184, 0.3);
     }
     
     .status-success {
-        color: #10b981;
+        color: #28a745;
         font-weight: bold;
-        text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
     }
     
     .status-warning {
-        color: #f59e0b;
+        color: #ffc107;
         font-weight: bold;
-        text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
     }
     
     .status-error {
-        color: #ef4444;
+        color: #dc3545;
         font-weight: bold;
-        text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
     }
     
     .calendar-section {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        background: #f8f9fa;
         padding: 20px;
-        border-radius: 15px;
+        border-radius: 10px;
         margin-bottom: 20px;
-        border: 2px solid rgba(148, 163, 184, 0.2);
-        box-shadow: 
-            0 0 15px rgba(148, 163, 184, 0.1),
-            inset 0 0 15px rgba(148, 163, 184, 0.05);
-        backdrop-filter: blur(5px);
+        border-left: 4px solid #2E86AB;
     }
     
     .date-info {
         font-size: 18px;
-        color: #cbd5e1;
+        color: #2E86AB;
         font-weight: 600;
         text-align: center;
         margin-bottom: 10px;
-        text-shadow: 0 0 8px rgba(203, 213, 225, 0.4);
     }
     
-    /* Dark glacier theme for Streamlit elements */
-    .stApp {
-        background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #1e293b 100%);
-        color: #e2e8f0;
-    }
-    
-    /* Style all Streamlit buttons to look like glacier cards */
+    /* Style all Streamlit buttons to look like gradient cards */
     div[data-testid="stButton"] > button[kind="primary"] {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #334155 50%, #475569 75%, #64748b 100%) !important;
-        border: 2px solid rgba(148, 163, 184, 0.3) !important;
-        border-radius: 20px !important;
-        color: #e2e8f0 !important;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #ff6b9d 100%) !important;
+        border: none !important;
+        border-radius: 25px !important;
+        color: white !important;
         text-align: center !important;
-        box-shadow: 
-            0 0 20px rgba(148, 163, 184, 0.2),
-            inset 0 0 20px rgba(148, 163, 184, 0.1),
-            0 10px 25px rgba(15, 23, 42, 0.5) !important;
+        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3) !important;
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
         min-height: 200px !important;
         font-size: 26px !important;
         font-weight: 700 !important;
-        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7) !important;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2) !important;
         width: 100% !important;
         margin: 10px 0 !important;
-        backdrop-filter: blur(10px) !important;
-        position: relative !important;
-        overflow: hidden !important;
     }
     
     div[data-testid="stButton"] > button[kind="primary"]:hover {
         transform: translateY(-15px) scale(1.03) !important;
-        box-shadow: 
-            0 0 30px rgba(148, 163, 184, 0.4),
-            inset 0 0 30px rgba(148, 163, 184, 0.2),
-            0 20px 40px rgba(15, 23, 42, 0.7) !important;
-        background: linear-gradient(135deg, #1e293b 0%, #334155 25%, #475569 50%, #64748b 75%, #94a3b8 100%) !important;
-        border-color: rgba(148, 163, 184, 0.6) !important;
-        color: #f1f5f9 !important;
+        box-shadow: 0 25px 50px rgba(102, 126, 234, 0.4) !important;
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 50%, #ff6b9d 100%) !important;
     }
     
     div[data-testid="stButton"] > button[kind="primary"]:active {
         transform: translateY(-8px) scale(1.01) !important;
-    }
-    
-    /* Sidebar styling */
-    .css-1d391kg {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    }
-    
-    /* Metrics styling */
-    div[data-testid="metric-container"] {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        border-radius: 10px;
-        padding: 10px;
-        box-shadow: 0 0 10px rgba(148, 163, 184, 0.1);
-    }
-    
-    /* Text inputs and selects glacier theme */
-    .stSelectbox > div > div {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-        border: 1px solid rgba(148, 163, 184, 0.3);
-        border-radius: 8px;
-        color: #e2e8f0;
-    }
-    
-    .stTextInput > div > div > input {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-        border: 1px solid rgba(148, 163, 184, 0.3);
-        border-radius: 8px;
-        color: #e2e8f0;
-    }
-    
-    /* Expander styling */
-    .streamlit-expanderHeader {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        border-radius: 8px;
-        color: #cbd5e1;
-    }
-    
-    /* Info/warning/error boxes glacier theme */
-    .stAlert {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-        border: 1px solid rgba(148, 163, 184, 0.3);
-        border-radius: 8px;
-        color: #e2e8f0;
     }
 </style>
 """, unsafe_allow_html=True)
